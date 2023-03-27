@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Лабораторная работа №2</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container-fluid">
+    <h1>Лабораторная работа №2</h1>
+    <h2>Авто:</h2>
+    <div class="container mb-5">
+        <form>
+            <div class="mb-3">
+                <label for="modelName" class="form-label">Название модели</label>
+                <input type="text" class="form-control" id="modelName" required>
+            </div>
+            <div class="mb-3">
+                <label for="brandName" class="form-label">Марка модели</label>
+                <input type="text" class="form-control" id="brandName" required>
+            </div>
+            <div class="mb-3">
+                <label for="year" class="form-label">Год</label>
+                <input type="number" class="form-control" id="year" min="1900" max="2023" required>
+            </div>
+            <div class="mb-3">
+                <label for="maxSpeed" class="form-label">Максимальная скорость</label>
+                <input type="number" class="form-control" id="maxSpeed" min="1" max="700" required>
+            </div>
+            <div class="mb-3">
+                <label for="capacity" class="form-label">Объём двигателя</label>
+                <input type="number" class="form-control" id="capacity" step="0.1" min="0.1" max="10" required>
+            </div>
+            <div class="mb-3">
+                <label for="price" class="form-label">Цена</label>
+                <input type="number" class="form-control" id="price" required>
+            </div>
+            <button class="btn btn-primary">Добавить авто</button>
+        </form>
+    </div>
+    <div id="cars" class="container">
+    </div>
+</div>
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script>
+    let car_list = document.getElementById("cars");
+    let modelNameInput = document.getElementById("modelName")
+    let brandNameInput = document.getElementById("brandName")
+    let yearInput = document.getElementById("year")
+    let maxSpeedInput = document.getElementById("maxSpeed")
+    let capacityInput = document.getElementById("capacity")
+    let priceInput = document.getElementById("price")
+    document.getElementsByTagName("form")[0].addEventListener("submit", addCar)
+
+    function addCar(event) {
+        event.preventDefault()
+        let car = {
+            modelName: modelNameInput.value,
+            brandName: brandNameInput.value,
+            year: yearInput.value,
+            maxSpeed: maxSpeedInput.value,
+            capacity: capacityInput.value,
+            price: priceInput.value,
+        }
+        fetch("/cars", {
+            method: "POST",
+            body: JSON.stringify(car)
+        })
+        createCard(car)
+    }
+
+    function createCard(car) {
+        let cardCar = document.createElement("div")
+        cardCar.classList.add("card")
+        cardCar.classList.add("mb-3")
+        let cardBody = document.createElement("div")
+        cardBody.classList.add("card-body")
+        let cardModel = document.createElement("h3")
+        cardModel.textContent = `${car.modelName}`
+        let cardBrand = document.createElement("h3")
+        cardBrand.textContent = `${car.brandName}`
+        let cardYear = document.createElement("h4")
+        cardYear.textContent = car.year
+        let cardMaxSpeed = document.createElement("h4")
+        cardMaxSpeed.textContent = `Максимальная скорость: ${car.maxSpeed}`
+        let cardCapacity = document.createElement("h4")
+        cardCapacity.textContent = `Объём двигателя: ${car.capacity}`
+        let cardPrice = document.createElement("h4")
+        cardPrice.textContent = `Цена: ${car.price}`
+        cardModel.classList.add("card_title")
+        cardBody.append(cardModel)
+        cardBody.append(cardBrand)
+        cardBody.append(cardYear)
+        cardBody.append(cardMaxSpeed)
+        cardBody.append(cardCapacity)
+        cardBody.append(cardPrice)
+        cardCar.append(cardBody)
+        car_list.insertBefore(cardCar, car_list.firstChild)
+    }
+
+    async function cars_upload() {
+        let response = await fetch("/cars")
+        let cars = await response.json()
+        for (let car of cars) {
+            createCard(car)
+        }
+    }
+
+    cars_upload()
+</script>
+</body>
+</html>
